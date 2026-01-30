@@ -29,26 +29,22 @@ Route::get('/detail_produk', [ProdukController::class, 'detail_produk'])->name('
 //Keranjang
 Route::get('/keranjang', [KeranjangController::class, 'keranjang'])->name('keranjang');
 
-//Checkout - Bisa dilakukan dengan atau tanpa login
-Route::post('/checkout/process', [CheckoutController::class, 'processCheckout'])
-    ->name('checkout.process');
-
-
-//Auth (Login, Register, Logout, Profil)
+//Auth (Login & Register - Public)
 Route::get('/register', [AuthController::class, 'register'])->name('register');
-Route::get('/login', [AuthController::class, 'register'])->name('login'); // ← TAMBAH INI
-Route::post('/register', [AuthController::class, 'registerSubmit'])->name('auth.register'); // ← hapus .submit
-Route::post('/login', [AuthController::class, 'loginSubmit'])->name('auth.login'); // ← hapus .submit juga
-Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+Route::get('/login', [AuthController::class, 'register'])->name('login'); 
+Route::post('/register', [AuthController::class, 'registerSubmit'])->name('auth.register'); 
+Route::post('/login', [AuthController::class, 'loginSubmit'])->name('auth.login'); 
 
-// Profil - Protected by auth
+// Protected Routes (Profil, Logout, Checkout)
 Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
     Route::get('/profil', [AuthController::class, 'profil'])->name('profil');
+    Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
+    Route::get('/form', [FormController::class, 'form'])->name('form');
+    Route::post('/checkout/process', [CheckoutController::class, 'processCheckout'])->name('checkout.process');
 });
 
-//Form & Kontak
-Route::get('/form', [FormController::class, 'form'])->name('form');
+// Kontak (tetap publik)
 Route::get('/kontak', [FormController::class, 'kontak'])->name('kontak');
 
 //admin - Protected by auth + admin middleware

@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profil Saya - Nand Second</title>
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+<script>
+    (function() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    })();
+</script>
 <style>
 body { margin:0; font-family:'Poppins',sans-serif; background:#f5f5f5; color:#222; line-height:1.5; }
 a { text-decoration:none; color:inherit; }
@@ -427,10 +438,46 @@ nav a:hover { color:#555; }
     <a href="{{route('produk')}}">Produk</a>
     <a href="{{route('beranda')}}">Beranda</a>
     <a href="{{route('beranda')}}#contact">Kontak</a>
+    
+    <button onclick="window.toggleDarkMode()" class="p-2 ml-4 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition" aria-label="Toggle Dark Mode">
+      <svg class="w-6 h-6 hidden dark:block text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+      <svg class="w-6 h-6 block dark:hidden text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+    <style>
+      :is(.dark) body { background: #0f172a; color: #f1f5f9; }
+      :is(.dark) header { background: #1e293b; color: #f1f5f9; border-bottom-color: #334155; }
+      :is(.dark) header h1 a { color: #f1f5f9; }
+      :is(.dark) nav a { color: #cbd5e1; }
+      :is(.dark) nav a:hover { color: #f1f5f9; }
+      :is(.dark) .user-menu:hover { background: #334155; }
+      :is(.dark) .profile-sidebar, :is(.dark) .profile-content { background: #1e293b; color: #f1f5f9; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+      :is(.dark) .profile-header { border-bottom-color: #334155; }
+      :is(.dark) .profile-header p { color: #94a3b8; }
+      :is(.dark) .profile-menu a { color: #cbd5e1; }
+      :is(.dark) .profile-menu a:hover { background: #334155; color: #f1f5f9; }
+      :is(.dark) .profile-menu a.active { background: #3b82f6; color: white; }
+      :is(.dark) .section h2 { color: #f1f5f9; }
+      :is(.dark) .form-group label { color: #cbd5e1; }
+      :is(.dark) .form-group input, :is(.dark) .form-group textarea { background: #334155; border-color: #475569; color: #f1f5f9; }
+      :is(.dark) .form-group input:disabled { background: #1e293b; color: #64748b; }
+      :is(.dark) .info-card { background: #1e293b; border: 1px solid #334155; }
+      :is(.dark) .info-row { border-bottom-color: #334155; }
+      :is(.dark) .info-label { color: #94a3b8; }
+      :is(.dark) .info-value { color: #f1f5f9; }
+      :is(.dark) .order-card { border-color: #334155; background: #1e293b; }
+      :is(.dark) .order-header, :is(.dark) .order-footer { border-color: #334155; }
+      :is(.dark) .order-total { color: #f1f5f9; }
+      :is(.dark) .order-item-details p { color: #94a3b8; }
+      :is(.dark) .empty-state h3 { color: #f1f5f9; }
+      :is(.dark) .empty-state p { color: #94a3b8; }
+      :is(.dark) .btn-secondary { background: transparent; border-color: #3b82f6; color: #3b82f6; }
+      :is(.dark) .btn-secondary:hover { background: #3b82f6; color: white; }
+    </style>
+
     <a href="{{route('keranjang')}}">🛒 Keranjang</a>
-    <div class="user-menu" onclick="window.location.href='user-profile.html'">
-      <div class="user-avatar" id="headerAvatar">U</div>
-      <span class="user-name" id="headerName">User</span>
+    <div class="user-menu" onclick="window.location.href='{{ route('profil') }}'">
+      <div class="user-avatar" id="headerAvatar">{{ substr($user->name, 0, 1) }}</div>
+      <span class="user-name" id="headerName">{{ explode(' ', $user->name)[0] }}</span>
     </div>
   </nav>
 </header>
@@ -439,9 +486,9 @@ nav a:hover { color:#555; }
   <!-- Sidebar -->
   <aside class="profile-sidebar">
     <div class="profile-header">
-      <div class="profile-avatar-large" id="sidebarAvatar">U</div>
-      <h2 id="sidebarName">User</h2>
-      <p id="sidebarEmail">user@email.com</p>
+      <div class="profile-avatar-large" id="sidebarAvatar">{{ substr($user->name, 0, 1) }}</div>
+      <h2 id="sidebarName">{{ $user->name }}</h2>
+      <p id="sidebarEmail">{{ $user->email }}</p>
     </div>
 
     <ul class="profile-menu">

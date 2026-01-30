@@ -195,6 +195,8 @@ class AdminController extends Controller
                 'stok' => 'required|integer|min:0',
                 'deskripsi' => 'nullable|string',
                 'label' => 'nullable|string|max:50',
+                'category' => 'nullable|string|max:50',
+                'size' => 'nullable|string|max:20',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
@@ -238,6 +240,8 @@ class AdminController extends Controller
                 'stok' => 'required|integer|min:0',
                 'deskripsi' => 'nullable|string',
                 'label' => 'nullable|string|max:50',
+                'category' => 'nullable|string|max:50',
+                'size' => 'nullable|string|max:20',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 

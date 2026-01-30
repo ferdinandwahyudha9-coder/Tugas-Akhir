@@ -7,6 +7,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+<script>
+    (function() {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+</script>
 <style>
 * {
   margin: 0;
@@ -460,58 +471,199 @@ nav a:hover {
   font-size: 1.1rem;
 }
 
-@media (max-width: 768px) {
-  header {
-    padding: 15px 20px;
-    flex-direction: column;
-    gap: 15px;
-  }
+    /* Responsive Navbar */
+    .hamburger {
+      display: none;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1001;
+    }
 
-  header h1 {
-    font-size: 1.5rem;
-  }
+    .hamburger span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: #111;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
 
-  .container {
-    margin: 30px 20px;
-    padding: 30px 20px;
-    gap: 30px;
-  }
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 6px);
+    }
 
-  .product-title {
-    font-size: 1.7rem;
-  }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
 
-  .price {
-    font-size: 1.6rem;
-  }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -6px);
+    }
 
-  .thumbnails img {
-    width: 70px;
-    height: 70px;
-  }
+    @media (max-width: 768px) {
+      header {
+        padding: 15px 20px;
+        position: sticky;
+      }
 
-  .action-buttons {
-    flex-direction: column;
-  }
+      .hamburger {
+        display: flex;
+        position: absolute;
+        right: 20px;
+        top: 25px;
+      }
 
-  .icon-btn {
-    width: 100%;
-  }
+      nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transform: translateY(-150%);
+        transition: transform 0.4s ease;
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+      }
 
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-}
+      nav.active {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        margin: 30px 20px;
+        padding: 30px 20px;
+        gap: 30px;
+      }
+
+      .product-title {
+        font-size: 1.7rem;
+      }
+
+      .price {
+        font-size: 1.6rem;
+      }
+
+      .thumbnails img {
+        width: 70px;
+        height: 70px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .icon-btn {
+        width: 100%;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Dark Mode Overrides */
+    :is(.dark) body {
+      background: #0f172a; /* slate-900 */
+      color: #f1f5f9; /* slate-100 */
+    }
+    :is(.dark) header {
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    :is(.dark) nav a {
+      color: #cbd5e1; /* slate-300 */
+    }
+    :is(.dark) nav a:hover {
+      color: #818cf8; /* indigo-400 */
+    }
+    :is(.dark) .container {
+      background: #1e293b; /* slate-800 */
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    :is(.dark) .product-title {
+      color: #f1f5f9;
+    }
+    :is(.dark) .section-title {
+      color: #e2e8f0;
+    }
+    :is(.dark) .description,
+    :is(.dark) .features-list li,
+    :is(.dark) .info-label {
+      color: #94a3b8; /* slate-400 */
+    }
+    :is(.dark) .info-value,
+    :is(.dark) .price-label {
+      color: #e2e8f0;
+    }
+    :is(.dark) .price {
+      color: #818cf8;
+    }
+    :is(.dark) .price-section {
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    }
+    :is(.dark) .main-image-wrapper {
+      background: #334155;
+    }
+    :is(.dark) .thumbnails img {
+      border-color: #475569;
+    }
+    :is(.dark) .thumbnails img:hover,
+    :is(.dark) .thumbnails img.active {
+      border-color: #818cf8;
+    }
+    :is(.dark) .info-item {
+      background: #334155;
+      border-left-color: #818cf8;
+    }
+    :is(.dark) .icon-btn {
+      background: #334155;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+    :is(.dark) .icon-btn:hover {
+      background: #475569;
+      border-color: #818cf8;
+    }
+    :is(.dark) .hamburger span {
+      background: #f1f5f9;
+    }
+    :is(.dark) nav {
+      background: #1e293b;
+    }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Nand Second</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
   <nav>
     <a href="{{route('beranda')}}">Beranda</a>
     <a href="{{route('produk')}}">Produk</a>
     <a href="{{route('keranjang')}}">Keranjang</a>
+    <button onclick="window.toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition" aria-label="Toggle Dark Mode">
+      <!-- Sun Icon -->
+      <svg class="w-6 h-6 hidden dark:block text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+      <!-- Moon Icon -->
+      <svg class="w-6 h-6 block dark:hidden text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
   </nav>
 </header>
 
@@ -574,25 +726,29 @@ nav a:hover {
 </div>
 
 <script>
-const produkList = [
-  {id:1, nama:"MP x LC True Blood", deskripsi:"Used Like New VVGC - Kondisi sangat baik, nyaris seperti baru. Tidak ada cacat atau kerusakan berarti.", harga:180000, hargaStr:"Rp 180.000", images:["{{ asset('images/tb1.jpeg') }}","{{ asset('images/tb2.jpeg') }}","{{ asset('images/tb3.jpeg') }}"]},
-  {id:2, nama:"Lads Club", deskripsi:"Used 1x VVGC - Baru dipakai sekali, kondisi masih sangat prima. Seperti baru dari toko.", harga:260000, hargaStr:"Rp 260.000", images:["{{ asset('images/lc1.jpeg') }}","{{ asset('images/lc2.jpeg') }}","{{ asset('images/lc3.jpeg') }}"]},
-  {id:3, nama:"FNF x PH", deskripsi:"Used Conditions - Kondisi bekas pakai normal, masih layak dan nyaman digunakan.", harga:330000, hargaStr:"Rp 330.000", images:["{{ asset('images/bh1.jpeg') }}","{{ asset('images/bh2.jpeg') }}","{{ asset('images/bh3.jpeg') }}"]},
-  {id:4, nama:"James Boogie", deskripsi:"With Minus Drop Color - Ada sedikit luntur warna, namun tidak mengurangi kualitas dan kenyamanan produk.", harga:450000, hargaStr:"Rp 450.000", images:["{{ asset('images/jb1.jpeg') }}","{{ asset('images/jb3.jpeg') }}"]}
-];
-
-const params = new URLSearchParams(window.location.search);
-const id = parseInt(params.get('id'));
-const produk = produkList.find(p => p.id === id);
+const produk = @json($produk);
 
 if (produk) {
   const mainImage = document.getElementById('mainImage');
   const thumbnailsDiv = document.getElementById('thumbnails');
 
-  mainImage.src = produk.images[0];
-
-  // Generate thumbnails
-  produk.images.forEach((imgSrc, idx) => {
+  // Handle single image or array of images if backend supports it
+  // Currently controller returns single 'image' string. 
+  // If we want multiple images, we'd need to update controller or handle it here.
+  // For now, let's treat it as single image for main, and maybe placeholders for thumbnails if needed
+  // OR just use the single image.
+  
+  // Actually, the static code used an array `images`. The controller returns `image` (string).
+  // Let's adapt.
+  const images = [produk.image]; // Wrap in array for compatibility with existing logic if needed
+  
+  mainImage.src = images[0];
+  
+  // Clear thumbnails if only 1 image (or just hide them if not needed)
+  thumbnailsDiv.innerHTML = '';
+  
+  // If we want to simulate thumbnails or if backend sends them:
+  images.forEach((imgSrc, idx) => {
     const thumb = document.createElement('img');
     thumb.src = imgSrc;
     if (idx === 0) thumb.classList.add('active');
@@ -608,6 +764,16 @@ if (produk) {
   document.getElementById('produkNama').textContent = produk.nama;
   document.getElementById('produkDeskripsi').textContent = produk.deskripsi;
   document.getElementById('produkHarga').textContent = produk.hargaStr;
+  
+  // Update condition badge if available
+  const badge = document.getElementById('conditionBadge');
+  if (produk.stok > 0) {
+      badge.textContent = "✓ Tersedia";
+      badge.style.background = "#4caf50";
+  } else {
+      badge.textContent = "✕ Habis";
+      badge.style.background = "#f44336";
+  }
 
   // Add to cart functionality
   document.getElementById('addToBagBtn').onclick = () => {
@@ -620,10 +786,11 @@ if (produk) {
       cart[existingIndex].qty = (cart[existingIndex].qty || 1) + 1;
     } else {
       cart.push({
+        id: produk.id,
         name: produk.nama,
         price: produk.harga,
         qty: 1,
-        image: produk.images[0]
+        image: produk.image // controller returns 'image' string
       });
     }
 
@@ -653,10 +820,11 @@ if (produk) {
 
     setTimeout(() => {
       localStorage.setItem('checkoutItem', JSON.stringify([{
+        id: produk.id,
         name: produk.nama,
         price: produk.harga,
         qty: 1,
-        image: produk.images[0]
+        image: produk.image
       }]));
       window.location.href = '{{route("checkout")}}';
     }, 800);
@@ -674,6 +842,13 @@ if (produk) {
       </a>
     </div>
   `;
+}
+
+function toggleMenu() {
+  const nav = document.querySelector('nav');
+  const hamburger = document.querySelector('.hamburger');
+  nav.classList.toggle('active');
+  hamburger.classList.toggle('active');
 }
 </script>
 

@@ -5,6 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nand Second - Casual Football Culture</title>
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
   <style>
     * {
       margin: 0;
@@ -26,172 +37,6 @@
       color: inherit;
     }
 
-    /* Header */
-    header {
-      background: #fff;
-      color: #111;
-      padding: 20px 50px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      border-bottom: 1px solid #e0e0e0;
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s;
-    }
-
-    header.scrolled {
-      padding: 15px 50px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    header h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    header h1:hover {
-      color: #667eea;
-    }
-
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      font-weight: 500;
-      transition: 0.3s;
-      position: relative;
-      padding: 5px 0;
-    }
-
-    nav a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 0;
-      height: 2px;
-      background: #667eea;
-      transition: all 0.3s;
-      transform: translateX(-50%);
-    }
-
-    nav a:hover::after {
-      width: 100%;
-    }
-
-    nav a:hover {
-      color: #667eea;
-    }
-
-    /* Bagian kanan header */
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    /* Search box */
-    .search-box {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .search-box input {
-      padding: 10px 40px 10px 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 25px;
-      font-size: 0.9rem;
-      transition: all 0.3s;
-      width: 200px;
-    }
-
-    .search-box input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-      width: 250px;
-    }
-
-    .search-box img {
-      position: absolute;
-      right: 15px;
-      width: 18px;
-      height: 18px;
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    /* Icon keranjang */
-    .icon-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      position: relative;
-      padding: 8px;
-      border-radius: 50%;
-      transition: all 0.3s;
-    }
-
-    .icon-btn:hover {
-      background: #f5f5f5;
-    }
-
-    .icon-btn img {
-      width: 26px;
-      height: 26px;
-      transition: transform 0.3s ease;
-    }
-
-    .icon-btn:hover img {
-      transform: scale(1.15);
-    }
-
-    .cart-badge {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background: #ff3b3b;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 700;
-      box-shadow: 0 2px 8px rgba(255, 59, 59, 0.4);
-    }
-
-    /* User web Menu */
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      padding: 8px 15px;
-      border-radius: 25px;
-      transition: all 0.3s;
-      border: 2px solid #e0e0e0;
-    }
-
-    .user-menu:hover {
-      background: #f5f5f5;
-      border-color: #667eea;
-      transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
 
@@ -606,6 +451,18 @@
       line-height: 2;
     }
 
+    /* Dark Mode for Profile */
+    :is(.dark) .profile {
+      background: #111827; /* gray-900 */
+      color: #f9fafb;
+    }
+    :is(.dark) .profile h2 {
+      color: #fff;
+    }
+    :is(.dark) .profile p {
+      color: #9ca3af; /* gray-400 */
+    }
+
     /* Contact Section */
     .contact {
       background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
@@ -777,95 +634,16 @@
       display: flex;
     }
 
-    /* Responsive */
-    @media(max-width:768px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 15px 20px;
-      }
-
-      nav {
-        flex-wrap: wrap;
-        justify-content: space-between;
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      .nav-right {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 10px;
-      }
-
-      .search-box {
-        flex: 1;
-      }
-
-      .search-box input {
-        width: 100%;
-      }
-
-      .hero {
-        height: 70vh;
-      }
-
-      .hero h2 {
-        font-size: 2.2rem;
-      }
-
-      .hero p {
-        font-size: 1.1rem;
-      }
-
-      .hero-cta {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .cta-btn {
-        width: 100%;
-      }
-
-      .stats-section {
-        padding: 40px 20px;
-        gap: 30px;
-      }
-
-      .stat-number {
-        font-size: 2.5rem;
-      }
-
-      .story,
-      .featured,
-      .profile,
-      .contact {
-        padding: 60px 20px;
-      }
-
-      .story h2,
-      .featured h2,
-      .profile h2,
-      .contact h2 {
-        font-size: 2rem;
-      }
-
-      .timeline {
-        grid-template-columns: 1fr;
-      }
-
-      .produk-container {
-        grid-template-columns: 1fr;
-      }
-
-      .produk-card img {
-        height: 300px;
-      }
-
-      .contact-info {
-        flex-direction: column;
-        gap: 20px;
-      }
+    /* Mobile Styles for content only */
+    @media (max-width: 768px) {
+      /* Sesuaikan elemen lain */
+      .hero { height: 60vh; }
+      .hero h2 { font-size: 2rem; }
+      .produk-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+      .produk-card img { height: 200px; }
+      .stats-section { grid-template-columns: 1fr 1fr; }
+      .timeline { grid-template-columns: 1fr; }
+      .contact-info { flex-direction: column; gap: 15px; }
     }
   </style>
 </head>
@@ -874,30 +652,40 @@
 
   <header id="header">
     <h1 onclick="window.location.href='{{route('beranda')}}'">Nand Second</h1>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
     <nav>
       <a href="{{route('produk')}}">Produk</a>
       <a href="#story">Sejarah</a>
       <a href="#contact">Kontak</a>
+      
+        <button onclick="toggleDarkMode()" class="icon-btn" title="Toggle Dark Mode" style="margin-right: 15px;">
+          <!-- Moon Icon -->
+          <svg class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+          <!-- Sun Icon -->
+          <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        </button>
 
-      <div class="nav-right">
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="Cari produk...">
-          <img src="{{ asset('images/download.jpg') }}" alt="Cari">
-        </div>
-        <button class="icon-btn" onclick="window.location.href='{{route('keranjang')}}'">
+        <button class="icon-btn" onclick="window.location.href='{{ route('keranjang') }}'" style="margin-right: 15px;">
           <img src="{{ asset('images/keranjang.jpg') }}" alt="Keranjang">
           <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
         </button>
 
-        <!-- USER MENU -->
         @auth
-          <div class="user-menu" onclick="window.location.href='{{route('profil')}}'" title="Profil Saya">
-            <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
-            <span class="user-name">{{ explode(' ', Auth::user()->name)[0] }}</span>
-          </div>
+        <div class="user-menu" onclick="window.location.href='{{ route('profil') }}'" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem;">
+                {{ substr(Auth::user()->name, 0, 1) }}
+            </div>
+            <span style="font-size: 0.9rem; font-weight: 500; color: #333;" class="hidden md:block">{{ explode(' ', Auth::user()->name)[0] }}</span>
+        </div>
         @else
-          <button class="login-btn" onclick="window.location.href='{{route('register')}}'">Login</button>
+        <a href="{{ route('login') }}" style="font-weight: 500; color: #333;">Login</a>
         @endauth
+
+
       </div>
     </nav>
   </header>
@@ -1037,12 +825,7 @@
     }
 
     // Produk list
-    const produkList = [
-      { id: 1, nama: "MP x LC TRUE BLOOD", hargaStr: "Rp 180.000", image: "{{ asset('images/tb1.jpeg') }}", label: "New" },
-      { id: 2, nama: "Lads Club Moscow", hargaStr: "Rp 260.000", image: "{{ asset('images/lc1.jpeg') }}", label: "Best Seller" },
-      { id: 3, nama: "FNF x PH", hargaStr: "Rp 330.000", image: "{{ asset('images/bh1.jpeg') }}", label: "Hot" },
-      { id: 4, nama: "James Boogie", hargaStr: "Rp 450.000", image: "{{ asset('images/jb1.jpeg') }}", label: "New" }
-    ];
+    const produkList = @json($products);
 
     const container = document.getElementById('produkContainer');
     produkList.forEach(p => {
@@ -1061,17 +844,7 @@
       container.appendChild(card);
     });
 
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const keyword = searchInput.value.trim();
-        if (keyword) {
-          window.location.href = `produk.blade.php?search=${encodeURIComponent(keyword)}`;
-        }
-      }
-    });
+
 
     // Header scroll effect
     window.addEventListener('scroll', () => {
@@ -1090,6 +863,14 @@
         scrollTop.classList.remove('show');
       }
     });
+
+    // Toggle Mobile Menu
+    function toggleMenu() {
+      const nav = document.querySelector('nav');
+      const hamburger = document.querySelector('.hamburger');
+      nav.classList.toggle('active');
+      hamburger.classList.toggle('active');
+    }
 
     // Scroll to top
     function scrollToTop() {

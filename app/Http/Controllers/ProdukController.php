@@ -14,59 +14,79 @@ class ProdukController extends Controller
             'ip' => request()->ip(),
             'timestamp' => now()
         ]);
-        return view('produk');
+
+        // Fetch all products for the product page
+        $products = \App\Models\Product::latest()->get()->map(function($product) {
+            return [
+                'id' => $product->id,
+                'nama' => $product->nama,
+                'harga' => $product->harga,
+                'hargaStr' => 'Rp ' . number_format($product->harga, 0, ',', '.'),
+                'image' => (function($img) {
+                    if (!$img) return asset('images/placeholder.jpg');
+                    if (str_starts_with($img, 'http')) return $img;
+                    
+                    $cleanPath = ltrim($img, '/');
+                    
+                    // Check if file exists in public/images (e.g. for "tb1.jpeg")
+                    if (file_exists(public_path('images/' . $cleanPath))) {
+                        return asset('images/' . $cleanPath);
+                    }
+                    
+                    // Check if path is relative to public (e.g. "images/tb1.jpeg")
+                    if (file_exists(public_path($cleanPath))) {
+                        return asset($cleanPath);
+                    }
+                    
+                    return asset('storage/' . $cleanPath);
+                })($product->image),
+                'category' => 'new',
+                'label' => $product->label ?? 'New',
+                'deskripsi' => $product->deskripsi
+            ];
+        });
+
+        return view('produk', compact('products'));
     }
     // Ganti method detailproduk() menjadi detail_produk()
     public function detail_produk(Request $request)
     {
         $id = $request->query('id');
 
-        // Dummy data produk (nanti bisa diganti dengan database)
-        $produkList = [
-            1 => [
-                'id' => 1,
-                'nama' => 'MP x LC TRUE BLOOD',
-                'harga' => 180000,
-                'hargaStr' => 'Rp 180.000',
-                'image' => '/images/tb1.jpeg',
-                'deskripsi' => 'Kolaborasi eksklusif antara MP dan Lads Club',
-                'stok' => 10
-            ],
-            2 => [
-                'id' => 2,
-                'nama' => 'Lads Club Moscow',
-                'harga' => 260000,
-                'hargaStr' => 'Rp 260.000',
-                'image' => '/images/lc1.jpeg',
-                'deskripsi' => 'Jersey casual football culture',
-                'stok' => 5
-            ],
-            3 => [
-                'id' => 3,
-                'nama' => 'FNF x PH',
-                'harga' => 330000,
-                'hargaStr' => 'Rp 330.000',
-                'image' => '/images/bh1.jpeg',
-                'deskripsi' => 'Kolaborasi premium FNF x PH',
-                'stok' => 8
-            ],
-            4 => [
-                'id' => 4,
-                'nama' => 'James Boogie',
-                'harga' => 450000,
-                'hargaStr' => 'Rp 450.000',
-                'image' => '/images/jb1.jpeg',
-                'deskripsi' => 'Limited edition James Boogie collection',
-                'stok' => 3
-            ]
-        ];
+        // Fetch from DB
+        $productModel = \App\Models\Product::find($id);
 
-        // Ambil produk berdasarkan ID
-        $produk = $produkList[$id] ?? null;
-
-        if (!$produk) {
+        if (!$productModel) {
             abort(404, 'Produk tidak ditemukan');
         }
+
+        // Map to array format expected by the view
+        $produk = [
+            'id' => $productModel->id,
+            'nama' => $productModel->nama,
+            'harga' => $productModel->harga,
+            'hargaStr' => 'Rp ' . number_format($productModel->harga, 0, ',', '.'),
+            'image' => (function($img) {
+                if (!$img) return asset('images/placeholder.jpg');
+                if (str_starts_with($img, 'http')) return $img;
+                
+                $cleanPath = ltrim($img, '/');
+                
+                // Check if file exists in public/images
+                if (file_exists(public_path('images/' . $cleanPath))) {
+                    return asset('images/' . $cleanPath);
+                }
+                
+                // Check if path is relative to public
+                if (file_exists(public_path($cleanPath))) {
+                    return asset($cleanPath);
+                }
+                
+                return asset('storage/' . $cleanPath);
+            })($productModel->image),
+            'deskripsi' => $productModel->deskripsi ?? 'Tidak ada deskripsi',
+            'stok' => $productModel->stok
+        ];
 
         return view('detail_produk', compact('produk'));
     }

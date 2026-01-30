@@ -58,7 +58,7 @@ class AuthController extends Controller
             return redirect()->route('admin.index')->with('success', 'Selamat datang Admin!');
         }
 
-        return redirect()->route('beranda')->with('success', 'Login berhasil!');
+        return redirect()->intended(route('beranda'))->with('success', 'Login berhasil!');
     }
 
     // Proses register
@@ -88,7 +88,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('beranda')->with('success', 'Registrasi berhasil! Selamat datang!');
+        return redirect()->intended(route('beranda'))->with('success', 'Registrasi berhasil! Selamat datang!');
     }
 
     // Profil user

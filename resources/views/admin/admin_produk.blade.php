@@ -1,1040 +1,444 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Produk</title>
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@extends('layouts.admin')
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  display: flex;
-  background: #f4f6f9;
-}
+@section('title', 'Produk')
 
-/* Sidebar */
-.sidebar {
-  width: 260px;
-  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
-  color: white;
-  height: 100vh;
-  position: fixed;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-}
-
-.sidebar-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #374151;
-  text-align: center;
-}
-
-.sidebar-header h2 {
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-}
-
-.sidebar-header p {
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 1rem 0;
-}
-
-.sidebar ul li {
-  padding: 0.9rem 1.5rem;
-  cursor: pointer;
-  border-left: 3px solid transparent;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-}
-
-.sidebar ul li:hover {
-  background: #374151;
-  border-left-color: #3b82f6;
-}
-
-.sidebar ul li.active {
-  background: #374151;
-  border-left-color: #3b82f6;
-}
-
-.sidebar ul li::before {
-  content: "▸";
-  margin-right: 0.8rem;
-  color: #6b7280;
-}
-
-/* Content */
-.content {
-  margin-left: 260px;
-  padding: 2rem;
-  width: calc(100% - 260px);
-  min-height: 100vh;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.header h1 {
-  font-size: 2rem;
-  color: #1f2937;
-}
-
-.header p {
-  color: #6b7280;
-  margin-top: 0.5rem;
-}
-
-/* Stats Cards */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: white;
-  padding: 1.2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: all 0.3s;
-}
-
-.stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.12);
-}
-
-.stat-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-}
-
-.stat-icon.blue { background: #dbeafe; }
-.stat-icon.green { background: #d1fae5; }
-.stat-icon.orange { background: #fef3c7; }
-.stat-icon.purple { background: #ede9fe; }
-
-.stat-info h3 {
-  color: #6b7280;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.stat-info p {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1f2937;
-  margin-top: 0.3rem;
-}
-
-/* Filter Section */
-.filter-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  margin-bottom: 1.5rem;
-}
-
-.filter-row {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.search-box {
-  flex: 1;
-  min-width: 300px;
-  position: relative;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 0.8rem 1rem 0.8rem 2.8rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: all 0.3s;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.search-box::before {
-  content: "🔍";
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.filter-select {
-  padding: 0.8rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  background: white;
-}
-
-/* Buttons */
-.btn {
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: all 0.3s;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-.btn-success {
-  background: #10b981;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #059669;
-}
-
-.btn-edit {
-  background: #3b82f6;
-  color: white;
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-}
-
-.btn-edit:hover {
-  background: #2563eb;
-}
-
-.btn-delete {
-  background: #ef4444;
-  color: white;
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-}
-
-.btn-delete:hover {
-  background: #dc2626;
-}
-
-.btn-secondary {
-  background: #f3f4f6;
-  color: #1f2937;
-}
-
-.btn-secondary:hover {
-  background: #e5e7eb;
-}
-
-/* Product Grid View */
-.view-toggle {
-  display: flex;
-  gap: 0.5rem;
-  background: white;
-  padding: 0.3rem;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.view-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.3s;
-}
-
-.view-btn.active {
-  background: #3b82f6;
-  color: white;
-}
-
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.product-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: all 0.3s;
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.product-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  background: #f3f4f6;
-}
-
-.product-info {
-  padding: 1.2rem;
-}
-
-.product-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-}
-
-.product-price {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #10b981;
-  margin-bottom: 0.8rem;
-}
-
-.product-details {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.product-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-/* Table View */
-.table-container {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  overflow-x: auto;
-  display: none;
-}
-
-.table-container.active {
-  display: block;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-thead {
-  background: #f9fafb;
-}
-
-th {
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: #6b7280;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-td {
-  padding: 1rem;
-  border-bottom: 1px solid #f3f4f6;
-  color: #1f2937;
-}
-
-tbody tr {
-  transition: all 0.2s;
-}
-
-tbody tr:hover {
-  background: #f9fafb;
-}
-
-.product-thumb {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.stock-badge {
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  display: inline-block;
-}
-
-.stock-badge.high {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.stock-badge.medium {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.stock-badge.low {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  animation: fadeIn 0.3s;
-  overflow-y: auto;
-}
-
-.modal-content {
-  background-color: white;
-  margin: 3% auto;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  animation: slideIn 0.3s;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.modal-header h2 {
-  color: #1f2937;
-  font-size: 1.5rem;
-}
-
-.close {
-  font-size: 2rem;
-  cursor: pointer;
-  color: #6b7280;
-  transition: all 0.3s;
-}
-
-.close:hover {
-  color: #1f2937;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.form-group {
-  margin-bottom: 1.2rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #374151;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-family: inherit;
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.image-upload {
-  border: 2px dashed #e5e7eb;
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.image-upload:hover {
-  border-color: #3b82f6;
-  background: #f9fafb;
-}
-
-.image-upload input {
-  display: none;
-}
-
-.image-preview {
-  max-width: 100%;
-  max-height: 200px;
-  margin-top: 1rem;
-  border-radius: 8px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 0;
-    overflow: hidden;
-  }
-
-  .content {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .stats-row {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-row {
-    flex-direction: column;
-  }
-
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
-</head>
-<body>
-
-<div class="sidebar">
-  <div class="sidebar-header">
-    <h2>⚡ Admin Panel</h2>
-    <p>Nand Second</p>
-  </div>
-  <ul>
-    <li onclick="location.href='{{route('admin.index')}}'">Dashboard</li>
-    <li onclick="location.href='{{route('admin.users')}}'" >Users</li>
-    <li class="active" onclick="location.href='{{route('admin.produk')}}'" >Produk</li>
-    <li onclick="location.href='{{route('admin.pesanan')}}'" >Pesanan</li>
-    <!-- <li onclick="location.href='{{route('admin.pesanan.detail', 1)}}'" >Detail Pesanan</li> -->
-  </ul>
-</div>
-
-<div class="content">
-  <div class="header">
+@section('header')
     <div>
-      <h1>📦 Product Management</h1>
-      <p>Kelola semua produk di katalog Anda</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">📦 Product Management</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">Kelola semua produk di katalog Anda</p>
     </div>
-    <button class="btn btn-success" onclick="openModal('add')">➕ Tambah Produk Baru</button>
-  </div>
+@endsection
 
-  <!-- Stats Cards -->
-<div class="stats-row">
-  <div class="stat-card">
-    <div class="stat-icon blue">📦</div>
-    <div class="stat-info">
-      <h3>Total Produk</h3>
-      <p>{{ $products->total() }}</p>
-    </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon green">✅</div>
-    <div class="stat-info">
-      <h3>Stok Tersedia</h3>
-      <p>{{ $products->sum('stok') }}</p>
-    </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon orange">⚠️</div>
-    <div class="stat-info">
-      <h3>Stok Menipis</h3>
-      <p>{{ $products->where('stok', '<', 10)->count() }}</p>
-    </div>
-  </div>
-  <!-- <div class="stat-card">
-    <div class="stat-icon purple">💰</div>
-    <div class="stat-info">
-      <h3>Total Value</h3>
-      <p>Rp {{ number_format($products->sum(function($p) { return $p->harga * $p->stok; }), 0, ',', '.') }}</p>
-    </div>
-  </div> -->
-</div>
+@section('actions')
+    <button onclick="openModal('add')" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium shadow-sm transition text-sm flex items-center gap-2">
+        ➕ Tambah Produk Baru
+    </button>
+@endsection
 
-  <!-- Filter Section -->
-  <div class="filter-section">
-    <div class="filter-row">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Cari nama produk atau ID..." onkeyup="searchProducts()">
-      </div>
-      <select class="filter-select" id="categoryFilter" onchange="filterByCategory()">
-        <option value="">Semua Kategori</option>
-        <option value="Kaos">Kaos</option>
-        <option value="Jaket">Jaket</option>
-        <option value="Aksesoris">Aksesoris</option>
-      </select>
-      <select class="filter-select" id="stockFilter" onchange="filterByStock()">
-        <option value="">Semua Stok</option>
-        <option value="high">Stok Tinggi (>20)</option>
-        <option value="medium">Stok Sedang (10-20)</option>
-        <option value="low">Stok Rendah (<10)</option>
-      </select>
-      <div class="view-toggle">
-        <button class="view-btn active" onclick="toggleView('grid')">🔲 Grid</button>
-        <button class="view-btn" onclick="toggleView('table')">📋 Table</button>
-      </div>
-      <button class="btn btn-secondary" onclick="resetFilters()">🔄 Reset</button>
-    </div>
-  </div>
-
-  <!-- Grid View -->
-<div class="products-grid" id="gridView">
-  @forelse($products as $product)
-  <div class="product-card">
-    <img src="{{ Str::startsWith($product->image, 'products/') ? asset('storage/'.$product->image) : asset('images/'.$product->image) }}" alt="{{ $product->nama }}" class="product-image">
-    <div class="product-info">
-      <div class="product-title">{{ $product->nama }}</div>
-      <div class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</div>
-      <div class="product-details">
-        <span>📦 Stok: {{ $product->stok }}</span>
-        <span>🏷️ {{ $product->label ?? 'N/A' }}</span>
-      </div>
-      <div class="product-actions">
-        <button class="btn btn-edit" onclick="openModal('edit', {{ $product->id }})">✏️ Edit</button>
-        <button class="btn btn-delete" onclick="deleteProduct({{ $product->id }})">🗑️</button>
-      </div>
-    </div>
-  </div>
-  @empty
-  <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-    <p style="color: #6b7280; font-size: 1.1rem;">Belum ada produk. Klik "Tambah Produk Baru" untuk menambah.</p>
-  </div>
-  @endforelse
-</div>
-
-<!-- Table View -->
-<div class="table-container" id="tableView">
-  <table id="productsTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Foto</th>
-        <th>Nama Produk</th>
-        <th>Stok</th>
-        <th>Harga</th>
-        <th>Label</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      @forelse($products as $product)
-      <tr>
-        <td>#{{ $product->id }}</td>
-        <td><img src="{{ Str::startsWith($product->image, 'products/') ? asset('storage/'.$product->image) : asset('images/'.$product->image) }}" class="product-thumb" alt="{{ $product->nama }}"></td>
-        <td>{{ $product->nama }}</td>
-        <td>
-          <span class="stock-badge {{ $product->stok > 20 ? 'high' : ($product->stok > 10 ? 'medium' : 'low') }}">
-            {{ $product->stok }} pcs
-          </span>
-        </td>
-        <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
-        <td>{{ $product->label ?? '-' }}</td>
-        <td>
-          <button class="btn btn-edit" onclick="openModal('edit', {{ $product->id }})">✏️</button>
-          <button class="btn btn-delete" onclick="deleteProduct({{ $product->id }})">🗑️</button>
-        </td>
-      </tr>
-      @empty
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 2rem;">
-          <p style="color: #6b7280;">Belum ada produk</p>
-        </td>
-      </tr>
-      @endforelse
-    </tbody>
-  </table>
-  
-  <!-- Pagination -->
-  <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
-    {{ $products->links() }}
-  </div>
-</div>
-
-<!-- Modal -->
-<div id="productModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 id="modalTitle">➕ Tambah Produk Baru</h2>
-      <span class="close" onclick="closeModal()">&times;</span>
-    </div>
-    <form id="productForm">
-      <div class="form-group">
-        <label>Upload Foto Produk</label>
-        <div class="image-upload" onclick="document.getElementById('imageInput').click()">
-          <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
-          <div>📷 Klik untuk upload gambar</div>
-          <img id="imagePreview" class="image-preview" style="display:none;">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Nama Produk</label>
-        <input type="text" id="productName" placeholder="Masukkan nama produk" required>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Kategori</label>
-          <select id="productCategory" required>
-            <option value="">Pilih Kategori</option>
-            <option value="Kaos">Kaos</option>
-            <option value="Jaket">Jaket</option>
-            <option value="Celana">Celana</option>
-            <option value="Aksesoris">Aksesoris</option>
-          </select>
+@section('content')
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-l-4 border-blue-500 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-xl">📦</div>
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Total Produk</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ $products->total() }}</div>
+            </div>
         </div>
 
-        <div class="form-group">
-          <label>Ukuran</label>
-          <select id="productSize" required>
-            <option value="">Pilih Ukuran</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-            <option value="All">All Size</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Harga</label>
-          <input type="number" id="productPrice" placeholder="100000" required>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-l-4 border-green-500 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center text-xl">✅</div>
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Stok Tersedia</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ $products->sum('stok') }}</div>
+            </div>
         </div>
 
-        <div class="form-group">
-          <label>Stok</label>
-          <input type="number" id="productStock" placeholder="20" required>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-l-4 border-yellow-500 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-yellow-100 dark:bg-yellow-900/50 flex items-center justify-center text-xl">⚠️</div>
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Stok Menipis</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ $products->where('stok', '<', 10)->count() }}</div>
+            </div>
         </div>
-      </div>
+    </div>
 
-      <div class="form-group">
-        <label>Deskripsi Produk</label>
-        <textarea id="productDescription" placeholder="Masukkan deskripsi produk..."></textarea>
-      </div>
+    <!-- Filter Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
+        <div class="flex flex-col md:flex-row gap-4 flex-wrap">
+            <div class="flex-1 relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Cari nama produk atau ID..." 
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-shadow dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+            </div>
+            
+            <select id="categoryFilter" onchange="filterByCategory()" 
+                class="w-full md:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                <option value="">Semua Kategori</option>
+                <option value="Kaos">Kaos</option>
+                <option value="Jaket">Jaket</option>
+                <option value="Aksesoris">Aksesoris</option>
+            </select>
+            
+            <select id="stockFilter" onchange="filterByStock()" 
+                class="w-full md:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                <option value="">Semua Stok</option>
+                <option value="high">Stok Tinggi (>20)</option>
+                <option value="medium">Stok Sedang (10-20)</option>
+                <option value="low">Stok Rendah (<10)</option>
+            </select>
+            
+            <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg border border-gray-200 dark:border-gray-600">
+                <button onclick="toggleView('grid')" class="view-btn active px-3 py-1.5 rounded-md text-sm font-medium transition-all text-white bg-blue-600 shadow-sm">🔲 Grid</button>
+                <button onclick="toggleView('table')" class="view-btn px-3 py-1.5 rounded-md text-sm font-medium transition-all text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">📋 Table</button>
+            </div>
+            
+            <button onclick="resetFilters()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition text-sm flex items-center gap-2">
+                🔄 Reset
+            </button>
+        </div>
+    </div>
 
-      <div class="form-group">
-  <label>Label Produk</label>
-  <select id="productLabel">
-    <option value="">Tanpa Label</option>
-    <option value="new">New</option>
-    <option value="hot">Hot</option>
-    <option value="sale">Sale</option>
-    <option value="best">Best Seller</option>
-  </select>
-</div>
+    <!-- Grid View -->
+    <div id="gridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @forelse($products as $product)
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
+                <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                    <img src="{{ Str::startsWith($product->image, 'products/') ? asset('storage/'.$product->image) : asset('images/'.$product->image) }}" 
+                        alt="{{ $product->nama }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                </div>
+                <div class="p-5">
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-1 truncate">{{ $product->nama }}</h3>
+                    <div class="text-lg font-bold text-green-600 mb-3">Rp {{ number_format($product->harga, 0, ',', '.') }}</div>
+                    
+                    <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 mb-4">
+                        <span class="flex items-center gap-1">📦 Stok: {{ $product->stok }}</span>
+                        <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">🏷️ {{ $product->label ?? 'N/A' }}</span>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="editProduct({{ $product->id }})" class="flex-1 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 font-medium text-xs transition-colors">✏️ Edit</button>
+                        <button onclick="deleteProduct({{ $product->id }})" class="flex-1 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 font-medium text-xs transition-colors">🗑️ Hapus</button>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-span-full py-12 text-center">
+                <p class="text-gray-500 text-lg">Belum ada produk. Klik "Tambah Produk Baru" untuk menambah.</p>
+            </div>
+        @endforelse
+    </div>
 
-<div class="form-actions">
-  <button type="submit" class="btn btn-primary">💾 Simpan Produk</button>
-  <button type="button" class="btn btn-secondary" onclick="closeModal()">❌ Batal</button>
-</div>
+    <!-- Table View -->
+    <div id="tableView" class="hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 uppercase text-xs font-semibold border-b border-gray-200 dark:border-gray-700">
+                    <tr>
+                        <th class="p-4">ID</th>
+                        <th class="p-4">Foto</th>
+                        <th class="p-4">Nama Produk</th>
+                        <th class="p-4">Stok</th>
+                        <th class="p-4">Harga</th>
+                        <th class="p-4">Kategori</th>
+                        <th class="p-4">Ukuran</th>
+                        <th class="p-4">Label</th>
+                        <th class="p-4">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse($products as $product)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <td class="p-4 font-mono text-xs">#{{ $product->id }}</td>
+                            <td class="p-4">
+                                <img src="{{ Str::startsWith($product->image, 'products/') ? asset('storage/'.$product->image) : asset('images/'.$product->image) }}" 
+                                    class="w-12 h-12 rounded object-cover border border-gray-200 dark:border-gray-600" alt="{{ $product->nama }}">
+                            </td>
+                            <td class="p-4 font-medium">{{ $product->nama }}</td>
+                            <td class="p-4">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium 
+                                    {{ $product->stok > 20 ? 'bg-green-100 text-green-800' : ($product->stok > 10 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                                    {{ $product->stok }} pcs
+                                </span>
+                            </td>
+                            <td class="p-4">Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
+                             <td class="p-4 text-gray-500 dark:text-gray-400">{{ $product->category ?? '-' }}</td>
+                             <td class="p-4 text-gray-500 dark:text-gray-400">{{ $product->size ?? '-' }}</td>
+                            <td class="p-4 text-gray-500 dark:text-gray-400">{{ $product->label ?? '-' }}</td>
+                            <td class="p-4">
+                                <div class="flex gap-2">
+                                    <button onclick="editProduct({{ $product->id }})" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition">✏️</button>
+                                    <button onclick="deleteProduct({{ $product->id }})" class="p-1.5 text-red-600 hover:bg-red-50 rounded transition">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="p-8 text-center text-gray-500">Belum ada produk</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination -->
+        <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-center">
+            {{ $products->links() }}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="productModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeModal()"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="text-xl font-semibold leading-6 text-gray-900 dark:text-white" id="modalTitle">➕ Tambah Produk Baru</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="text-2xl">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <form id="productForm">
+                        @csrf
+                        <input type="hidden" id="productId" name="id">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Foto Produk</label>
+                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors" onclick="document.getElementById('imageInput').click()">
+                                <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)" class="hidden">
+                                <div class="text-sm text-gray-600 dark:text-gray-400">📷 Klik untuk upload gambar</div>
+                                <img id="imagePreview" class="mt-3 mx-auto max-h-48 rounded hidden">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Produk</label>
+                            <input type="text" id="productName" name="nama" placeholder="Masukkan nama produk" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
+                                <select id="productCategory" name="category" required
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 dark:text-white">
+                                    <option value="">Pilih Kategori</option>
+                                    <option value="Kaos">Kaos</option>
+                                    <option value="Jaket">Jaket</option>
+                                    <option value="Celana">Celana</option>
+                                    <option value="Aksesoris">Aksesoris</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ukuran</label>
+                                <select id="productSize" name="size" required
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 dark:text-white">
+                                    <option value="">Pilih Ukuran</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                    <option value="All">All Size</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Harga (Rp)</label>
+                                <input type="number" id="productPrice" name="harga" placeholder="0" required
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stok</label>
+                                <input type="number" id="productStock" name="stok" placeholder="0" required
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Label (Opsional)</label>
+                            <input type="text" id="productLabel" name="label" placeholder="Contoh: New Arrival"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi</label>
+                            <textarea id="productDescription" name="deskripsi" rows="3" placeholder="Masukkan deskripsi produk"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"></textarea>
+                        </div>
+                        
+                        <div class="flex gap-3 justify-end">
+                            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition text-sm">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition text-sm shadow-sm">Simpan Produk</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('scripts')
 <script>
-let currentProductId = null;
-let currentMode = null;
+    function toggleView(view) {
+        const gridBtn = document.querySelector('button[onclick="toggleView(\'grid\')"]');
+        const tableBtn = document.querySelector('button[onclick="toggleView(\'table\')"]');
+        const gridView = document.getElementById('gridView');
+        const tableView = document.getElementById('tableView');
 
-// View Toggle
-function toggleView(view) {
-  const gridView = document.getElementById('gridView');
-  const tableView = document.getElementById('tableView');
-  const buttons = document.querySelectorAll('.view-btn');
+        if (view === 'grid') {
+            gridView.classList.remove('hidden');
+            gridView.classList.add('grid');
+            tableView.classList.add('hidden');
+            
+            gridBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+            gridBtn.classList.remove('text-gray-600', 'hover:text-gray-900');
+            
+            tableBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+            tableBtn.classList.add('text-gray-600', 'hover:text-gray-900');
+        } else {
+            gridView.classList.add('hidden');
+            gridView.classList.remove('grid');
+            tableView.classList.remove('hidden');
+            
+            tableBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+            tableBtn.classList.remove('text-gray-600', 'hover:text-gray-900');
+            
+            gridBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+            gridBtn.classList.add('text-gray-600', 'hover:text-gray-900');
+        }
+    }
 
-  buttons.forEach(btn => btn.classList.remove('active'));
-
-  if (view === 'grid') {
-    gridView.style.display = 'grid';
-    tableView.classList.remove('active');
-    buttons[0].classList.add('active');
-  } else {
-    gridView.style.display = 'none';
-    tableView.classList.add('active');
-    buttons[1].classList.add('active');
-  }
-}
-
-// Modal Functions
-function openModal(mode, productId = null) {
-  const modal = document.getElementById('productModal');
-  const modalTitle = document.getElementById('modalTitle');
-  const form = document.getElementById('productForm');
-
-  currentMode = mode;
-  currentProductId = productId;
-
-  if (mode === 'add') {
-    modalTitle.textContent = '➕ Tambah Produk Baru';
-    form.reset();
-    document.getElementById('imagePreview').style.display = 'none';
-  } else if (mode === 'edit' && productId) {
-    modalTitle.textContent = '✏️ Edit Produk';
+    // Modal Functions
+    const modal = document.getElementById('productModal');
     
-    // Load product data from server
-    fetch(`/admin/produk/${productId}`, {
-      headers: {
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-      }
-    })
-    .then(response => response.json())
-    .then(product => {
-      document.getElementById('productName').value = product.nama || '';
-      document.getElementById('productPrice').value = product.harga || '';
-      document.getElementById('productStock').value = product.stok || '';
-      document.getElementById('productDescription').value = product.deskripsi || '';
-      document.getElementById('productLabel').value = product.label || '';
-      
-      if (product.image) {
-        const preview = document.getElementById('imagePreview');
-        preview.src = `/storage/${product.image}`;
-        preview.style.display = 'block';
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Gagal memuat data produk');
-    });
-  }
-
-  modal.style.display = 'block';
-}
-
-function closeModal() {
-  document.getElementById('productModal').style.display = 'none';
-  currentProductId = null;
-  currentMode = null;
-}
-
-window.onclick = function(event) {
-  const modal = document.getElementById('productModal');
-  if (event.target == modal) {
-    closeModal();
-  }
-}
-
-// Image Preview
-function previewImage(event) {
-  const preview = document.getElementById('imagePreview');
-  const file = event.target.files[0];
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
+    function openModal(type, id = null) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        if (type === 'add') {
+            document.getElementById('modalTitle').innerText = '➕ Tambah Produk Baru';
+            document.getElementById('productForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+        } else {
+            document.getElementById('modalTitle').innerText = '✏️ Edit Produk';
+            // Logic to fetch/fill data goes here
+        }
     }
-    reader.readAsDataURL(file);
-  }
-}
 
-// Form Submit
-document.getElementById('productForm').onsubmit = function(e) {
-  e.preventDefault();
-  
-  const formData = new FormData();
-  formData.append('nama', document.getElementById('productName').value);
-  formData.append('harga', document.getElementById('productPrice').value);
-  formData.append('stok', document.getElementById('productStock').value);
-  formData.append('deskripsi', document.getElementById('productDescription').value || '');
-  formData.append('label', document.getElementById('productLabel')?.value || '');
-  
-  const imageInput = document.getElementById('imageInput');
-  if (imageInput.files[0]) {
-    formData.append('image', imageInput.files[0]);
-  }
-
-  if (currentMode === 'add') {
-    fetch('/admin/produk', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-        'Accept': 'application/json'
-      },
-      body: formData
-    })
-    .then(response => response.json())
-    .then(result => {
-      alert(result.success ? '✅ Produk berhasil ditambahkan!' : '❌ Gagal: ' + result.message);
-      if (result.success) {
-        closeModal();
-        location.reload();
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('❌ Terjadi kesalahan');
-    });
-
-  } else if (currentMode === 'edit' && currentProductId) {
-    formData.append('_method', 'PUT');
-    
-    fetch(`/admin/produk/${currentProductId}`, {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-        'Accept': 'application/json'
-      },
-      body: formData
-    })
-    .then(response => response.json())
-    .then(result => {
-      alert(result.success ? '✅ Produk berhasil diupdate!' : '❌ Gagal: ' + result.message);
-      if (result.success) {
-        closeModal();
-        location.reload();
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('❌ Terjadi kesalahan');
-    });
-  }
-}
-
-// Delete Product
-function deleteProduct(productId) {
-  if (!confirm('⚠️ Hapus produk ini?')) return;
-  
-  fetch(`/admin/produk/${productId}`, {
-    method: 'DELETE',
-    headers: {
-      'X-CSRF-TOKEN': '{{ csrf_token() }}',
-      'Accept': 'application/json'
+    function closeModal() {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
-  })
-  .then(response => response.json())
-  .then(result => {
-    alert(result.success ? '✅ Produk dihapus!' : '❌ Gagal: ' + result.message);
-    if (result.success) location.reload();
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('❌ Terjadi kesalahan');
-  });
-}
 
-// Search, Filter
-function searchProducts() {
-  const input = document.getElementById('searchInput').value.toLowerCase();
-  document.querySelectorAll('.product-card').forEach(card => {
-    card.style.display = card.textContent.toLowerCase().includes(input) ? '' : 'none';
-  });
-  
-  const rows = document.getElementById('productsTable')?.getElementsByTagName('tbody')[0]?.rows;
-  if (rows) {
-    for (let row of rows) {
-      row.style.display = row.textContent.toLowerCase().includes(input) ? '' : 'none';
+    // Close modal when clicking outside
+    // modal.addEventListener('click', function(e) {
+    //    if (e.target === modal) {
+    //        closeModal();
+    //    }
+    // });
+
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function(){
+            const output = document.getElementById('imagePreview');
+            output.src = reader.result;
+            output.style.display = 'block';
+            output.classList.remove('hidden');
+        };
+        reader.readAsDataURL(event.target.files[0]);
     }
-  }
-}
 
-function filterByCategory() { console.log('Filter category'); }
-function filterByStock() { console.log('Filter stock'); }
-function resetFilters() {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('categoryFilter').value = '';
-  document.getElementById('stockFilter').value = '';
-  searchProducts();
-}
+    // Search & Filter Placeholders
+    function searchProducts() {
+        // Implement search logic
+        console.log('Searching...');
+    }
+
+    function filterByCategory() {
+        console.log('Filtering by category...');
+    }
+
+    function filterByStock() {
+        console.log('Filtering by stock...');
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categoryFilter').value = '';
+        document.getElementById('stockFilter').value = '';
+        console.log('Filters reset');
+    }
+
+    function deleteProduct(id) {
+        if(!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
+        
+        fetch(`/admin/produk/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert('✅ Produk berhasil dihapus!');
+                location.reload();
+            } else {
+                alert('❌ Gagal: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('❌ Terjadi kesalahan fatal');
+        });
+    }
+
+    // Modal logic for Edit
+    function editProduct(id) {
+        openModal('edit', id);
+        fetch(`/admin/produk/${id}`, {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('productId').value = data.id;
+            document.getElementById('productName').value = data.nama;
+            document.getElementById('productCategory').value = data.category || '';
+            document.getElementById('productSize').value = data.size || '';
+            document.getElementById('productPrice').value = data.harga;
+            document.getElementById('productStock').value = data.stok;
+            document.getElementById('productLabel').value = data.label || '';
+            document.getElementById('productDescription').value = data.deskripsi || '';
+            if (data.image) {
+                const preview = document.getElementById('imagePreview');
+                preview.src = data.image.startsWith('products/') ? `/storage/${data.image}` : `/images/${data.image}`;
+                preview.style.display = 'block';
+                preview.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Update form submission
+    document.getElementById('productForm').onsubmit = function(e) {
+        e.preventDefault();
+        const id = document.getElementById('productId').value;
+        const formData = new FormData(this);
+        
+        // Handle images separately since FormData won't automatically include the file if handled via JS preview
+        const imageFile = document.getElementById('imageInput').files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        const url = id ? `/admin/produk/${id}` : '/admin/produk';
+        if (id) formData.append('_method', 'PUT');
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert(id ? '✅ Produk berhasil diupdate!' : '✅ Produk berhasil ditambahkan!');
+                location.reload();
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('❌ Terjadi kesalahan saat menyimpan');
+        });
+    };
 </script>
-
-</body>
-</html>
+@endpush

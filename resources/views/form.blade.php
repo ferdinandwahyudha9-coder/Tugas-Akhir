@@ -8,6 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+<script>
+    (function() {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+</script>
 <style>
 * {
   margin: 0;
@@ -363,55 +374,141 @@ textarea {
   color: #999;
 }
 
-@media (max-width: 768px) {
-  header {
-    padding: 15px 20px;
-    flex-direction: column;
-    gap: 15px;
-  }
+    /* Responsive Navbar */
+    .hamburger {
+      display: none;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1001;
+    }
 
-  header h1 {
-    font-size: 1.5rem;
-  }
+    .hamburger span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: #111;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
 
-  nav {
-    display: flex;
-    gap: 10px;
-  }
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 6px);
+    }
 
-  nav a {
-    margin: 0 10px;
-    font-size: 0.9rem;
-  }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
 
-  .container {
-    margin: 30px 20px;
-    padding: 25px 20px;
-    gap: 30px;
-  }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -6px);
+    }
 
-  .section-title {
-    font-size: 1.5rem;
-  }
+    @media (max-width: 768px) {
+      header {
+        padding: 15px 20px;
+        position: sticky;
+      }
 
-  .summary-section {
-    position: static;
-  }
+      .hamburger {
+        display: flex;
+        position: absolute;
+        right: 20px;
+        top: 25px;
+      }
 
-  .total-row {
-    font-size: 1.3rem;
-  }
-}
+      nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transform: translateY(-150%);
+        transition: transform 0.4s ease;
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      nav.active {
+        display: flex;
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        margin: 30px 20px;
+        padding: 25px 20px;
+        gap: 30px;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .summary-section {
+        position: static;
+      }
+
+      .total-row {
+        font-size: 1.3rem;
+      }
+    }
+
+/* Dark Mode Overrides */
+:is(.dark) body { background: #0f172a; color: #f1f5f9; }
+:is(.dark) header { background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
+:is(.dark) .container { background: #1e293b; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+:is(.dark) .section-title { color: #f1f5f9; }
+:is(.dark) label { color: #cbd5e1; }
+:is(.dark) input, 
+:is(.dark) textarea { background: #334155; border-color: #475569; color: #f1f5f9; }
+:is(.dark) input:focus, 
+:is(.dark) textarea:focus { background: #1e293b; border-color: #818cf8; }
+:is(.dark) .summary-section { background: linear-gradient(135deg, #334155 0%, #1e293b 100%); }
+:is(.dark) .summary-row { color: #cbd5e1; }
+:is(.dark) .item { border-bottom-color: #475569; }
+:is(.dark) .item-name { color: #f1f5f9; }
+:is(.dark) .item-price { color: #818cf8; }
+:is(.dark) .total-row { color: #f1f5f9; border-top-color: #475569; }
+:is(.dark) .back-link { color: #818cf8; }
+:is(.dark) .back-link:hover { color: #a5b4fc; }
+:is(.dark) .hamburger span { background: #f1f5f9; }
+:is(.dark) nav { background: #1e293b; }
+:is(.dark) nav a { color: #cbd5e1; }
+:is(.dark) nav a:hover { color: #818cf8; }
+:is(.dark) .empty-cart { color: #94a3b8; }
+:is(.dark) .empty-cart h3 { color: #f1f5f9; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Nand Second</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
   <nav>
     <a href="{{route('beranda')}}">Beranda</a>
     <a href="{{route('produk')}}">Produk</a>
     <a href="{{route('keranjang')}}">Keranjang</a>
+    <button onclick="window.toggleDarkMode()" class="p-2 ml-4 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition" aria-label="Toggle Dark Mode">
+      <svg class="w-6 h-6 hidden dark:block text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+      <svg class="w-6 h-6 block dark:hidden text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
   </nav>
 </header>
 
@@ -497,7 +594,7 @@ if (checkoutItem.length === 0) {
   // Tampilkan items
   checkoutItem.forEach((item, index) => {
     const qty = item.qty || 1;
-    const itemTotal = item.price * qty;
+    const itemTotal = parseFloat(item.price || 0) * qty;
     subtotal += itemTotal;
 
     const div = document.createElement('div');
@@ -566,10 +663,17 @@ if (checkoutItem.length === 0) {
       return;
     }
 
-    // Validasi kode pos
     if (kodepos.length !== 5) {
       alert("⚠️ Kode pos harus 5 digit!");
       return;
+    }
+
+    // Safety check: Pastikan semua item memiliki ID
+    const hasCorruptItems = checkoutItem.some(item => !item.id);
+    if (hasCorruptItems) {
+        alert("⚠️ Ada masalah dengan data di keranjang Anda. Silakan kembali ke keranjang untuk memperbarui data.");
+        window.location.href = '{{ route("keranjang") }}';
+        return;
     }
 
     // Cek CSRF token
@@ -642,6 +746,13 @@ if (checkoutItem.length === 0) {
       btn.disabled = false;
     }
   };
+}
+
+function toggleMenu() {
+  const nav = document.querySelector('nav');
+  const hamburger = document.querySelector('.hamburger');
+  nav.classList.toggle('active');
+  hamburger.classList.toggle('active');
 }
 </script>
 

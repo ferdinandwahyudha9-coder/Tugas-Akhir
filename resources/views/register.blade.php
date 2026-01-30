@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login & Register</title>
 
 <style>
@@ -158,6 +159,65 @@ body{
   text-align:center;
 }
 </style>
+<style>
+.mobile-text {
+  display: none;
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+.mobile-text span {
+  color: #1e90ff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    height: auto;
+    min-height: 500px;
+  }
+
+  .form {
+    width: 100%;
+    padding: 30px;
+  }
+
+  .overlay {
+    display: none;
+  }
+
+  .mobile-text {
+    display: block;
+  }
+
+  /* Reset transform for mobile to avoid sliding off-screen */
+  .container.active .login {
+    transform: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .container.active .register {
+    transform: none;
+    opacity: 1;
+    z-index: 5;
+    pointer-events: all;
+  }
+
+  .login {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .register {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -185,6 +245,7 @@ body{
         <div class="error-msg">{{ $errors->first('auth') }}</div>
       @endif
       <button type="submit">Login</button>
+      <p class="mobile-text">Belum punya akun? <span onclick="toggle()">Daftar sekarang</span></p>
     </form>
   </div>
 
@@ -207,6 +268,7 @@ body{
         <div class="error-msg">{{ $errors->first('password') }}</div>
       @endif
       <button type="submit">Daftar</button>
+      <p class="mobile-text">Sudah punya akun? <span onclick="toggle()">Login disini</span></p>
     </form>
   </div>
 

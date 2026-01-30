@@ -1,748 +1,295 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.admin')
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Pesanan</title>
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+@section('title', 'Pesanan')
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      background: #f4f6f9;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 260px;
-      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
-      color: white;
-      height: 100vh;
-      position: fixed;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid #374151;
-      text-align: center;
-    }
-
-    .sidebar-header h2 {
-      font-size: 1.3rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .sidebar-header p {
-      font-size: 0.8rem;
-      color: #9ca3af;
-    }
-
-    .sidebar ul {
-      list-style: none;
-      padding: 1rem 0;
-    }
-
-    .sidebar ul li {
-      padding: 0.9rem 1.5rem;
-      cursor: pointer;
-      border-left: 3px solid transparent;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-    }
-
-    .sidebar ul li:hover {
-      background: #374151;
-      border-left-color: #3b82f6;
-    }
-
-    .sidebar ul li.active {
-      background: #374151;
-      border-left-color: #3b82f6;
-    }
-
-    .sidebar ul li::before {
-      content: "▸";
-      margin-right: 0.8rem;
-      color: #6b7280;
-    }
-
-    /* Content */
-    .content {
-      margin-left: 260px;
-      padding: 2rem;
-      width: calc(100% - 260px);
-      min-height: 100vh;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    .header h1 {
-      font-size: 2rem;
-      color: #1f2937;
-    }
-
-    .header p {
-      color: #6b7280;
-      margin-top: 0.5rem;
-    }
-
-    /* Stats Cards */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: white;
-      padding: 1.2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      transition: all 0.3s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-    }
-
-    .stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-    }
-
-    .stat-icon.blue {
-      background: #dbeafe;
-    }
-
-    .stat-icon.green {
-      background: #d1fae5;
-    }
-
-    .stat-icon.orange {
-      background: #fef3c7;
-    }
-
-    .stat-icon.purple {
-      background: #ede9fe;
-    }
-
-    .stat-info h3 {
-      color: #6b7280;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    .stat-info p {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #1f2937;
-      margin-top: 0.3rem;
-    }
-
-    /* Filter Section */
-    .filter-section {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      margin-bottom: 1.5rem;
-    }
-
-    .filter-row {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .search-box {
-      flex: 1;
-      min-width: 300px;
-      position: relative;
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 0.8rem 1rem 0.8rem 2.8rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      transition: all 0.3s;
-    }
-
-    .search-box input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .search-box::before {
-      content: "🔍";
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .filter-select {
-      padding: 0.8rem 1rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      background: white;
-    }
-
-    /* Buttons */
-    .btn {
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: all 0.3s;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background: #3b82f6;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #2563eb;
-    }
-
-    .btn-view {
-      background: #8b5cf6;
-      color: white;
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-    }
-
-    .btn-view:hover {
-      background: #7c3aed;
-    }
-
-    .btn-edit {
-      background: #3b82f6;
-      color: white;
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-    }
-
-    .btn-edit:hover {
-      background: #2563eb;
-    }
-
-    .btn-secondary {
-      background: #f3f4f6;
-      color: #1f2937;
-    }
-
-    .btn-secondary:hover {
-      background: #e5e7eb;
-    }
-
-    /* Table */
-    .table-container {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    thead {
-      background: #f9fafb;
-    }
-
-    th {
-      padding: 1rem;
-      text-align: left;
-      font-weight: 600;
-      color: #6b7280;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      border-bottom: 2px solid #e5e7eb;
-    }
-
-    td {
-      padding: 1rem;
-      border-bottom: 1px solid #f3f4f6;
-      color: #1f2937;
-    }
-
-    tbody tr {
-      transition: all 0.2s;
-    }
-
-    tbody tr:hover {
-      background: #f9fafb;
-    }
-
-    .order-id {
-      font-weight: 600;
-      color: #3b82f6;
-    }
-
-    .customer-info {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    .customer-avatar {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
-    .status-badge {
-      padding: 0.4rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      display: inline-block;
-      text-align: center;
-      min-width: 80px;
-    }
-
-    .status-badge.pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-badge.processing {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .status-badge.shipped {
-      background: #e0e7ff;
-      color: #3730a3;
-    }
-
-    .status-badge.delivered {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .status-badge.cancelled {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      overflow-y: auto;
-    }
-
-    .modal-content {
-      background-color: white;
-      margin: 2% auto;
-      padding: 2rem;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid #e5e7eb;
-    }
-
-    .modal-header h2 {
-      color: #1f2937;
-      font-size: 1.5rem;
-    }
-
-    .close {
-      font-size: 2rem;
-      cursor: pointer;
-      color: #6b7280;
-      transition: all 0.3s;
-    }
-
-    .close:hover {
-      color: #1f2937;
-    }
-
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #374151;
-      font-weight: 500;
-    }
-
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.8rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 0.95rem;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 0;
-        overflow: hidden;
-      }
-
-      .content {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .stats-row {
-        grid-template-columns: 1fr;
-      }
-
-      .filter-row {
-        flex-direction: column;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2>⚡ Admin Panel</h2>
-      <p>Nand Second</p>
+@section('header')
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">🛒 Order Management</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">Kelola semua pesanan pelanggan Anda</p>
     </div>
-    <ul>
-      <li onclick="location.href='{{ route('admin.index') }}'">Dashboard</li>
-      <li onclick="location.href='{{ route('admin.users') }}'">Users</li>
-      <li onclick="location.href='{{ route('admin.produk') }}'">Produk</li>
-      <li class="active" onclick="location.href='{{ route('admin.pesanan') }}'">Pesanan</li>
-      <!-- <li onclick="location.href='{{route('admin.pesanan.detail', 1)}}'">Detail Pesanan</li> -->
-    </ul>
-  </div>
+@endsection
 
-  <div class="content">
-    <div class="header">
-      <div>
-        <h1>🛒 Order Management</h1>
-        <p>Kelola semua pesanan pelanggan Anda</p>
-      </div>
-    </div>
-
+@section('content')
     <!-- Stats Cards -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon orange">⏳</div>
-        <div class="stat-info">
-          <h3>Pending</h3>
-          <p>{{ $orders->where('status', 'pending')->count() }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-l-4 border-yellow-500 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-yellow-100 dark:bg-yellow-900/50 flex items-center justify-center text-xl">⏳</div>
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Pending</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ $orders->where('status', 'pending')->count() }}</div>
+            </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon blue">📦</div>
-        <div class="stat-info">
-          <h3>Processing</h3>
-          <p>{{ $orders->where('status', 'processing')->count() }}</p>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-l-4 border-blue-500 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-xl">📦</div>
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Processing</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ $orders->where('status', 'processing')->count() }}</div>
+            </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple">🚚</div>
-        <div class="stat-info">
-          <h3>Shipped</h3>
-          <p>{{ $orders->where('status', 'shipped')->count() }}</p>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-l-4 border-purple-500 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-xl">🚚</div>
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Shipped</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ $orders->where('status', 'shipped')->count() }}</div>
+            </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon green">✅</div>
-        <div class="stat-info">
-          <h3>Delivered</h3>
-          <p>{{ $orders->where('status', 'delivered')->count() }}</p>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-l-4 border-green-500 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center text-xl">✅</div>
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Delivered</div>
+                <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ $orders->where('status', 'delivered')->count() }}</div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Filter Section -->
-    <div class="filter-section">
-      <div class="filter-row">
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="Cari order number, nama customer..." onkeyup="searchTable()">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
+        <div class="flex flex-col md:flex-row gap-4 flex-wrap">
+            <div class="flex-1 relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Cari order number, nama customer..." 
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-shadow dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+            </div>
+            
+            <select id="statusFilter" onchange="filterByStatus()" 
+                class="w-full md:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                <option value="">Semua Status</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            
+            <button onclick="resetFilters()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition text-sm flex items-center gap-2">
+                🔄 Reset
+            </button>
         </div>
-        <select class="filter-select" id="statusFilter" onchange="filterByStatus()">
-          <option value="">Semua Status</option>
-          <option value="pending">Pending</option>
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <button class="btn btn-secondary" onclick="resetFilters()">🔄 Reset</button>
-      </div>
     </div>
 
     <!-- Table -->
-    <div class="table-container">
-      <table id="ordersTable">
-        <thead>
-          <tr>
-            <th>Order Number</th>
-            <th>Customer</th>
-            <th>Tanggal</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse($orders as $order)
-            <tr>
-              <td><span class="order-id">{{ $order->order_number }}</span></td>
-              <td>
-                <div class="customer-info">
-                  <div class="customer-avatar">{{ $order->user ? substr($order->user->name, 0, 1) : '?' }}</div>
-                  <div>
-                    <div style="font-weight: 600;">{{ $order->user->name ?? 'Guest' }}</div>
-                    <div style="font-size: 0.8rem; color: #6b7280;">{{ $order->user->email ?? '-' }}</div>
-                  </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table id="ordersTable" class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 uppercase text-xs font-semibold border-b border-gray-200 dark:border-gray-700">
+                    <tr>
+                        <th class="p-4">Order Number</th>
+                        <th class="p-4">Customer</th>
+                        <th class="p-4">Tanggal</th>
+                        <th class="p-4">Total</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse($orders as $order)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <td class="p-4 font-mono font-semibold text-blue-600">{{ $order->order_number }}</td>
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                                        {{ $order->user ? substr($order->user->name, 0, 1) : '?' }}
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-gray-900 dark:text-white">{{ $order->user->name ?? 'Guest' }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $order->user->email ?? '-' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4 whitespace-nowrap">{{ $order->created_at->format('d M Y, H:i') }}</td>
+                            <td class="p-4 font-medium text-gray-900 dark:text-white">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
+                            <td class="p-4">
+                                @php
+                                    $statusClasses = [
+                                        'pending' => 'bg-yellow-100 text-yellow-800',
+                                        'processing' => 'bg-blue-100 text-blue-800',
+                                        'shipped' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300',
+                                        'delivered' => 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+                                        'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+                                    ];
+                                    $class = $statusClasses[$order->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+                                @endphp
+                                <span class="px-3 py-1 rounded-full text-xs font-medium {{ $class }}">
+                                    {{ ucfirst($order->status) }}
+                                </span>
+                            </td>
+                            <td class="p-4">
+                                <div class="flex gap-2">
+                                    <button onclick="viewOrder({{ $order->id }})" class="px-3 py-1.5 bg-purple-50 text-purple-600 rounded hover:bg-purple-100 font-medium text-xs transition-colors">👁️ View</button>
+                                    <button onclick="editOrder({{ $order->id }})" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 font-medium text-xs transition-colors">✏️ Edit</button>
+                                    <button onclick="deleteOrder({{ $order->id }})" class="px-3 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 font-medium text-xs transition-colors">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-gray-500">Belum ada pesanan</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <!-- Pagination -->
+        <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-center">
+            {{ $orders->links() }}
+        </div>
+    </div>
+
+    <!-- Edit Order Modal -->
+    <div id="editOrderModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeEditModal()"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="text-xl font-semibold leading-6 text-gray-900 dark:text-white">✏️ Edit Status Pesanan</h3>
+                        <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="text-2xl">&times;</span>
+                        </button>
+                    </div>
+
+                    <form id="orderForm">
+                        <input type="hidden" id="orderId">
+                        
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status Pesanan</label>
+                            <select id="orderStatus" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-gray-700 dark:text-white">
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="flex gap-3 justify-end">
+                            <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition text-sm">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition text-sm shadow-sm">💾 Simpan Perubahan</button>
+                        </div>
+                    </form>
                 </div>
-              </td>
-              <td>{{ $order->created_at->format('d M Y, H:i') }}</td>
-              <td>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
-              <td><span class="status-badge {{ $order->status }}">{{ ucfirst($order->status) }}</span></td>
-              <td>
-                <button class="btn btn-view" onclick="viewOrder({{ $order->id }})">👁️ View</button>
-                <button class="btn btn-edit" onclick="editOrder({{ $order->id }})">✏️</button>
-                <button class="btn btn-delete" onclick="deleteOrder({{ $order->id }})">🗑️</button>
-              </td>
-            </tr>
-          @empty
-            <tr>
-              <td colspan="6" style="text-align: center; padding: 2rem;">
-                <p style="color: #6b7280;">Belum ada pesanan</p>
-              </td>
-            </tr>
-          @endforelse
-        </tbody>
-      </table>
-
-      <!-- Pagination -->
-      <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
-        {{ $orders->links() }}
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Order Modal -->
-  <div id="editOrderModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>✏️ Edit Status Pesanan</h2>
-        <span class="close" onclick="closeEditModal()">&times;</span>
-      </div>
-      <form id="orderForm">
-        <input type="hidden" id="orderId">
-
-        <div class="form-group">
-          <label>Status Pesanan</label>
-          <select id="orderStatus" required>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+            </div>
         </div>
-
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">💾 Simpan Perubahan</button>
-          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">❌ Batal</button>
-        </div>
-      </form>
     </div>
-  </div>
+@endsection
 
-  <script>
+@push('scripts')
+<script>
     // View Order
     function viewOrder(orderId) {
-      window.location.href = `/admin/pesanan/${orderId}`;
+        window.location.href = `/admin/pesanan/${orderId}`;
     }
 
     // Delete Order
     function deleteOrder(orderId) {
-      if (!confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
-        return;
-      }
-
-      fetch(`/admin/pesanan/${orderId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        if (!confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
+            return;
         }
-      })
+
+        fetch(`/admin/pesanan/${orderId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
-            alert('✅ Pesanan berhasil dihapus');
-            location.reload();
-          } else {
-            alert('❌ ' + data.message);
-          }
+            if (data.success) {
+                alert('✅ Pesanan berhasil dihapus');
+                location.reload();
+            } else {
+                alert('❌ ' + data.message);
+            }
         })
         .catch(error => {
-          console.error('Error:', error);
-          alert('❌ Terjadi kesalahan: ' + error.message);
+            console.error('Error:', error);
+            alert('❌ Terjadi kesalahan: ' + error.message);
         });
     }
 
     // Edit Order
     function editOrder(orderId) {
-      document.getElementById('orderId').value = orderId;
-      document.getElementById('editOrderModal').style.display = 'block';
+        document.getElementById('orderId').value = orderId;
+        // In a real scenario, you might want to fetch the current status or pass it in the function call
+        // For now, it just opens the modal
+        const modal = document.getElementById('editOrderModal');
+        modal.classList.remove('hidden');
     }
 
     function closeEditModal() {
-      document.getElementById('editOrderModal').style.display = 'none';
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function (event) {
-      const editModal = document.getElementById('editOrderModal');
-      if (event.target == editModal) {
-        closeEditModal();
-      }
+        document.getElementById('editOrderModal').classList.add('hidden');
     }
 
     // Form Submit
     document.getElementById('orderForm').onsubmit = async function (e) {
-      e.preventDefault();
+        e.preventDefault();
 
-      const orderId = document.getElementById('orderId').value;
-      const status = document.getElementById('orderStatus').value;
+        const orderId = document.getElementById('orderId').value;
+        const status = document.getElementById('orderStatus').value;
 
-      try {
-        const response = await fetch(`/admin/pesanan/${orderId}/status`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-          },
-          body: JSON.stringify({ status: status })
-        });
+        try {
+            const response = await fetch(`/admin/pesanan/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ status: status })
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if (result.success) {
-          alert('✅ Status pesanan berhasil diubah!');
-          location.reload();
-        } else {
-          alert('❌ Gagal: ' + result.message);
+            if (result.success) {
+                alert('✅ Status pesanan berhasil diubah!');
+                location.reload();
+            } else {
+                alert('❌ Gagal: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Terjadi kesalahan');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Terjadi kesalahan');
-      }
     }
 
     // Search Function
     function searchTable() {
-      const input = document.getElementById('searchInput').value.toLowerCase();
-      const rows = document.getElementById('ordersTable').getElementsByTagName('tbody')[0].rows;
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.getElementById('ordersTable').getElementsByTagName('tbody')[0].rows;
 
-      for (let row of rows) {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(input) ? '' : 'none';
-      }
+        for (let row of rows) {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(input) ? '' : 'none';
+        }
     }
 
     // Filter Functions
     function filterByStatus() {
-      const status = document.getElementById('statusFilter').value.toLowerCase();
-      const rows = document.getElementById('ordersTable').getElementsByTagName('tbody')[0].rows;
+        const status = document.getElementById('statusFilter').value.toLowerCase();
+        const rows = document.getElementById('ordersTable').getElementsByTagName('tbody')[0].rows;
 
-      for (let row of rows) {
-        if (status === '') {
-          row.style.display = '';
-        } else {
-          const statusCell = row.cells[4].textContent.toLowerCase();
-          row.style.display = statusCell.includes(status) ? '' : 'none';
+        for (let row of rows) {
+            if (status === '') {
+                row.style.display = '';
+            } else {
+                const statusCell = row.cells[4].innerText.toLowerCase(); // Use innerText to get text content of badge
+                row.style.display = statusCell.includes(status) ? '' : 'none';
+            }
         }
-      }
     }
 
     function resetFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('statusFilter').value = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
 
-      const rows = document.getElementById('ordersTable').getElementsByTagName('tbody')[0].rows;
-      for (let row of rows) {
-        row.style.display = '';
-      }
+        const rows = document.getElementById('ordersTable').getElementsByTagName('tbody')[0].rows;
+        for (let row of rows) {
+            row.style.display = '';
+        }
     }
-  </script>
-
-</body>
-
-</html>
+</script>
+@endpush
