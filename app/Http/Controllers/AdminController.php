@@ -198,15 +198,28 @@ class AdminController extends Controller
                 'category' => 'nullable|string|max:50',
                 'size' => 'nullable|string|max:20',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'gallery' => 'nullable|array|max:5',
+                'gallery.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
-            // Handle image upload
+            // Handle main image upload
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('products', 'public');
                 $validated['image'] = $imagePath;
             }
 
-            Product::create($validated);
+            $product = Product::create($validated);
+
+            // Handle gallery images
+            if ($request->hasFile('gallery')) {
+                foreach ($request->file('gallery') as $file) {
+                    $path = $file->store('products/gallery', 'public');
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image' => $path
+                    ]);
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -224,7 +237,7 @@ class AdminController extends Controller
     // Get single product
     public function getProduct($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::with('images')->findOrFail($id);
         return response()->json($product);
     }
 
@@ -243,13 +256,15 @@ class AdminController extends Controller
                 'category' => 'nullable|string|max:50',
                 'size' => 'nullable|string|max:20',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'gallery' => 'nullable|array|max:5',
+                'gallery.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
             // Handle image upload
             if ($request->hasFile('image')) {
                 // Delete old image if exists
                 if ($product->image && file_exists(storage_path('app/public/' . $product->image))) {
-                    unlink(storage_path('app/public/' . $product->image));
+                    @unlink(storage_path('app/public/' . $product->image));
                 }
 
                 $imagePath = $request->file('image')->store('products', 'public');
@@ -257,6 +272,23 @@ class AdminController extends Controller
             }
 
             $product->update($validated);
+
+            // Handle gallery images (if provided, it will append)
+            if ($request->hasFile('gallery')) {
+                $currentGalleryCount = $product->images()->count();
+                $remainingSlots = 5 - $currentGalleryCount;
+
+                if ($remainingSlots > 0) {
+                    $files = array_slice($request->file('gallery'), 0, $remainingSlots);
+                    foreach ($files as $file) {
+                        $path = $file->store('products/gallery', 'public');
+                        ProductImage::create([
+                            'product_id' => $product->id,
+                            'image' => $path
+                        ]);
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,

@@ -738,9 +738,8 @@ if (produk) {
   // For now, let's treat it as single image for main, and maybe placeholders for thumbnails if needed
   // OR just use the single image.
   
-  // Actually, the static code used an array `images`. The controller returns `image` (string).
-  // Let's adapt.
-  const images = [produk.image]; // Wrap in array for compatibility with existing logic if needed
+  // Combine main image with gallery images
+  const images = [produk.image, ...(produk.gallery || [])];
   
   mainImage.src = images[0];
   

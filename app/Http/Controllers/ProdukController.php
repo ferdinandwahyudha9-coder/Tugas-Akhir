@@ -54,7 +54,7 @@ class ProdukController extends Controller
         $id = $request->query('id');
 
         // Fetch from DB
-        $productModel = \App\Models\Product::find($id);
+        $productModel = \App\Models\Product::with('images')->find($id);
 
         if (!$productModel) {
             abort(404, 'Produk tidak ditemukan');
@@ -85,7 +85,10 @@ class ProdukController extends Controller
                 return asset('storage/' . $cleanPath);
             })($productModel->image),
             'deskripsi' => $productModel->deskripsi ?? 'Tidak ada deskripsi',
-            'stok' => $productModel->stok
+            'stok' => $productModel->stok,
+            'gallery' => $productModel->images->map(function($img) {
+                return asset('storage/' . $img->image);
+            })->toArray()
         ];
 
         return view('detail_produk', compact('produk'));

@@ -17,6 +17,8 @@ class ProductSeeder extends Seeder
                 'stok' => 25,
                 'image' => 'tb1.jpeg',
                 'label' => 'new',
+                'category' => 'T-Shirt',
+                'size' => 'L',
             ],
             [
                 'nama' => 'Lads Club Moscow',
@@ -25,6 +27,8 @@ class ProductSeeder extends Seeder
                 'stok' => 15,
                 'image' => 'lc1.jpeg',
                 'label' => 'hot',
+                'category' => 'Jersey',
+                'size' => 'L',
             ],
             [
                 'nama' => 'FNF x PH',
@@ -33,6 +37,8 @@ class ProductSeeder extends Seeder
                 'stok' => 10,
                 'image' => 'bh1.jpeg',
                 'label' => 'sale',
+                'category' => 'Jersey',
+                'size' => 'XL',
             ],
             [
                 'nama' => 'James Boogie',
@@ -41,6 +47,8 @@ class ProductSeeder extends Seeder
                 'stok' => 8,
                 'image' => 'jb1.jpeg',
                 'label' => 'best',
+                'category' => 'Jersey',
+                'size' => 'M',
             ],
             [
                 'nama' => 'Casual Football Tee',
@@ -49,11 +57,13 @@ class ProductSeeder extends Seeder
                 'stok' => 30,
                 'image' => 'default.jpg',
                 'label' => 'new',
+                'category' => 'T-Shirt',
+                'size' => 'L',
             ],
         ];
 
         foreach ($products as $product) {
-            Product::firstOrCreate(
+            Product::updateOrCreate(
                 ['nama' => $product['nama']], // Cek berdasarkan nama
                 $product
             );

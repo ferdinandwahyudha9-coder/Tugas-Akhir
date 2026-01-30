@@ -187,10 +187,18 @@
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Foto Produk</label>
                             <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors" onclick="document.getElementById('imageInput').click()">
-                                <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)" class="hidden">
-                                <div class="text-sm text-gray-600 dark:text-gray-400">📷 Klik untuk upload gambar</div>
+                                <input type="file" id="imageInput" name="image" accept="image/*" onchange="previewImage(event)" class="hidden">
+                                <div class="text-sm text-gray-600 dark:text-gray-400">📷 Klik untuk upload gambar utama</div>
                                 <img id="imagePreview" class="mt-3 mx-auto max-h-48 rounded hidden">
                             </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Galeri Foto Tambahan (Maks 5)</label>
+                            <input type="file" id="galleryInput" name="gallery[]" accept="image/*" multiple 
+                                class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:text-gray-400">
+                            <p class="text-xs text-gray-500 mt-1">* Anda bisa memilih beberapa file sekaligus</p>
+                            <div id="galleryPreview" class="mt-2 flex flex-wrap gap-2"></div>
                         </div>
 
                         <div class="mb-4">
@@ -332,6 +340,25 @@
         reader.readAsDataURL(event.target.files[0]);
     }
 
+    // Gallery Preview handling
+    document.getElementById('galleryInput').addEventListener('change', function(event) {
+        const previewContainer = document.getElementById('galleryPreview');
+        previewContainer.innerHTML = '';
+        
+        if (this.files) {
+            Array.from(this.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600';
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+
     // Search & Filter Placeholders
     function searchProducts() {
         // Implement search logic
@@ -400,6 +427,18 @@
                 preview.style.display = 'block';
                 preview.classList.remove('hidden');
             }
+
+            // Preview existing Gallery
+            const galleryPreview = document.getElementById('galleryPreview');
+            galleryPreview.innerHTML = '';
+            if (data.images && data.images.length > 0) {
+                data.images.forEach(imgData => {
+                    const img = document.createElement('img');
+                    img.src = `/storage/${imgData.image}`;
+                    img.className = 'w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600';
+                    galleryPreview.appendChild(img);
+                });
+            }
         });
     }
 
@@ -409,12 +448,6 @@
         const id = document.getElementById('productId').value;
         const formData = new FormData(this);
         
-        // Handle images separately since FormData won't automatically include the file if handled via JS preview
-        const imageFile = document.getElementById('imageInput').files[0];
-        if (imageFile) {
-            formData.append('image', imageFile);
-        }
-
         const url = id ? `/admin/produk/${id}` : '/admin/produk';
         if (id) formData.append('_method', 'PUT');
 
