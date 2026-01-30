@@ -67,4 +67,5 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::post('/admin/users', [AdminController::class, 'storeUser'])->name('admin.users.store');
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::delete('/admin/gallery/{id}', [AdminController::class, 'deleteGalleryImage'])->name('admin.gallery.delete');
 });

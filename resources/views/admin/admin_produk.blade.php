@@ -343,16 +343,27 @@
     // Gallery Preview handling
     document.getElementById('galleryInput').addEventListener('change', function(event) {
         const previewContainer = document.getElementById('galleryPreview');
-        previewContainer.innerHTML = '';
+        // Filter out existing previews before adding new ones
+        // previewContainer.innerHTML = ''; // Keep previous for now or clear based on preference
         
         if (this.files) {
             Array.from(this.files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative group w-16 h-16';
+                    
                     const img = document.createElement('img');
                     img.src = e.target.result;
-                    img.className = 'w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600';
-                    previewContainer.appendChild(img);
+                    img.className = 'w-full h-full object-cover rounded border border-gray-200 dark:border-gray-600';
+                    
+                    const badge = document.createElement('span');
+                    badge.innerText = 'New';
+                    badge.className = 'absolute -top-1 -right-1 bg-blue-500 text-white text-[8px] px-1 rounded-full';
+                    
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(badge);
+                    previewContainer.appendChild(wrapper);
                 }
                 reader.readAsDataURL(file);
             });
@@ -433,11 +444,44 @@
             galleryPreview.innerHTML = '';
             if (data.images && data.images.length > 0) {
                 data.images.forEach(imgData => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative group w-16 h-16';
+                    wrapper.id = `gallery-item-${imgData.id}`;
+                    
                     const img = document.createElement('img');
                     img.src = `/storage/${imgData.image}`;
-                    img.className = 'w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600';
-                    galleryPreview.appendChild(img);
+                    img.className = 'w-full h-full object-cover rounded border border-gray-200 dark:border-gray-600';
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.type = 'button';
+                    deleteBtn.innerHTML = '&times;';
+                    deleteBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity';
+                    deleteBtn.onclick = () => deleteGalleryImage(imgData.id);
+                    
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(deleteBtn);
+                    galleryPreview.appendChild(wrapper);
                 });
+            }
+        });
+    }
+
+    function deleteGalleryImage(id) {
+        if(!confirm('Hapus foto ini dari galeri?')) return;
+        
+        fetch(`/admin/gallery/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                document.getElementById(`gallery-item-${id}`).remove();
+            } else {
+                alert('Gagal menghapus: ' + data.message);
             }
         });
     }

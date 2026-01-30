@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
@@ -208,7 +209,7 @@ class AdminController extends Controller
                 $validated['image'] = $imagePath;
             }
 
-            $product = Product::create($validated);
+            $product = Product::create(collect($validated)->except(['gallery'])->toArray());
 
             // Handle gallery images
             if ($request->hasFile('gallery')) {
@@ -271,7 +272,7 @@ class AdminController extends Controller
                 $validated['image'] = $imagePath;
             }
 
-            $product->update($validated);
+            $product->update(collect($validated)->except(['gallery'])->toArray());
 
             // Handle gallery images (if provided, it will append)
             if ($request->hasFile('gallery')) {
@@ -301,6 +302,30 @@ class AdminController extends Controller
                 'message' => 'Validasi gagal: ' . json_encode($e->errors())
             ], 422);
 
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteGalleryImage($id)
+    {
+        try {
+            $image = ProductImage::findOrFail($id);
+            
+            // Delete file from storage
+            if ($image->image && file_exists(storage_path('app/public/' . $image->image))) {
+                @unlink(storage_path('app/public/' . $image->image));
+            }
+            
+            $image->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Foto galeri berhasil dihapus'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
