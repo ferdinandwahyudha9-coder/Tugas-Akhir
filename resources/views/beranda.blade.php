@@ -349,17 +349,17 @@
 
       0%,
       33% {
-        background-image: url('/images/lctb.jpeg');
+        background-image: url("{{ asset('images/lctb.jpeg') }}");
       }
 
       34%,
       66% {
-        background-image: url('/images/lcb.jpeg');
+        background-image: url("{{ asset('images/lcb.jpeg') }}");
       }
 
       67%,
       100% {
-        background-image: url('/images/true.jpeg');
+        background-image: url("{{ asset('images/true.jpeg') }}");
       }
     }
 
@@ -882,10 +882,10 @@
       <div class="nav-right">
         <div class="search-box">
           <input type="text" id="searchInput" placeholder="Cari produk...">
-          <img src="/images/download.jpg" alt="Cari">
+          <img src="{{ asset('images/download.jpg') }}" alt="Cari">
         </div>
         <button class="icon-btn" onclick="window.location.href='{{route('keranjang')}}'">
-          <img src="/images/keranjang.jpg" alt="Keranjang">
+          <img src="{{ asset('images/keranjang.jpg') }}" alt="Keranjang">
           <span class="cart-badge" id="cartBadge" style="display:none;">0</span>
         </button>
 
@@ -1038,10 +1038,10 @@
 
     // Produk list
     const produkList = [
-      { id: 1, nama: "MP x LC TRUE BLOOD", hargaStr: "Rp 180.000", image: "/images/tb1.jpeg", label: "New" },
-      { id: 2, nama: "Lads Club Moscow", hargaStr: "Rp 260.000", image: "/images/lc1.jpeg", label: "Best Seller" },
-      { id: 3, nama: "FNF x PH", hargaStr: "Rp 330.000", image: "/images/bh1.jpeg", label: "Hot" },
-      { id: 4, nama: "James Boogie", hargaStr: "Rp 450.000", image: "/images/jb1.jpeg", label: "New" }
+      { id: 1, nama: "MP x LC TRUE BLOOD", hargaStr: "Rp 180.000", image: "{{ asset('images/tb1.jpeg') }}", label: "New" },
+      { id: 2, nama: "Lads Club Moscow", hargaStr: "Rp 260.000", image: "{{ asset('images/lc1.jpeg') }}", label: "Best Seller" },
+      { id: 3, nama: "FNF x PH", hargaStr: "Rp 330.000", image: "{{ asset('images/bh1.jpeg') }}", label: "Hot" },
+      { id: 4, nama: "James Boogie", hargaStr: "Rp 450.000", image: "{{ asset('images/jb1.jpeg') }}", label: "New" }
     ];
 
     const container = document.getElementById('produkContainer');
