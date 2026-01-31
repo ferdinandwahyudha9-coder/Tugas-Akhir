@@ -84,7 +84,7 @@
         @forelse($products as $product)
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 group hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
                 <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
-                    <img src="{{ Str::startsWith($product->image, 'products/') ? asset('storage/'.$product->image) : asset('images/'.$product->image) }}" 
+                    <img src="{{ $product->image_url }}" 
                         alt="{{ $product->nama }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                 </div>
                 <div class="p-5">
@@ -131,7 +131,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                             <td class="p-4 font-mono text-xs">#{{ $product->id }}</td>
                             <td class="p-4">
-                                <img src="{{ Str::startsWith($product->image, 'products/') ? asset('storage/'.$product->image) : asset('images/'.$product->image) }}" 
+                                <img src="{{ $product->image_url }}" 
                                     class="w-12 h-12 rounded object-cover border border-gray-200 dark:border-gray-600" alt="{{ $product->nama }}">
                             </td>
                             <td class="p-4 font-medium">{{ $product->nama }}</td>

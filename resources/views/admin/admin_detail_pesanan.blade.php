@@ -189,7 +189,7 @@
                             <td class="p-4">
                                 <div class="flex items-center gap-4">
                                     <div class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 overflow-hidden border border-gray-200 dark:border-gray-600 shrink-0">
-                                        <img src="{{ $detail->product->image_url ?? 'https://via.placeholder.com/100' }}" 
+                                        <img src="{{ $detail->product->image_url }}" 
                                             class="w-full h-full object-cover" alt="{{ $detail->product->nama }}">
                                     </div>
                                     <div>
